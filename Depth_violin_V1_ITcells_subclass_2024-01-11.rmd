@@ -1,0 +1,174 @@
+
+
+```{r}
+#Author, Rinaldo D'Souza
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(Seurat)
+library(SingleCellExperiment)
+library(reshape2)
+library(edgeR)
+library(scuttle)
+library(scran)
+library(tibble)
+
+
+#turn off scientific notation
+options(scipen=999)
+```
+
+```{r}
+#annotation of clusters, subclasses, neighborhoods, etc.
+CTX_HIP_annot = fread("C:/Users/rinal/Box/HG_lab/Mati/GabelLab/RNAseq/Yao2021_mouse/CTX_HIP_Annotation_20190820_annotation_20200913.csv")
+CTX_HIP_annot[, cl := as.character(cl)]
+##this is how you can assign colors to cell types in a format that can be input into ggplot
+#for subtypes (known as cluster_label in Yao 2021 annotation table, predicted.id in Seurat label transfer outputs)
+name_vec_subtype = unique(CTX_HIP_annot$cluster_label)
+col_vec_subtype = unique(CTX_HIP_annot$cluster_color)
+colors_subtype = setNames(col_vec_subtype, name_vec_subtype)
+#for subclasses
+name_vec_subclass = unique(CTX_HIP_annot$subclass_label)
+col_vec_subclass = unique(CTX_HIP_annot$subclass_color)
+colors_subclass = setNames(col_vec_subclass, name_vec_subclass)
+#for neighborhoods
+name_vec_nhood = unique(CTX_HIP_annot$neighborhood_label)
+col_vec_nhood = unique(CTX_HIP_annot$neighborhood_color)
+colors_nhood = setNames(col_vec_nhood, name_vec_nhood)
+```
+
+```{r}
+####read in layer depth information
+All_Vis_layerdepth <- fread("C:/Users/rinal/Box/HG_lab/Mati/GabelLab/Vizgen/mecp2_MERFISH/summary_tables/layer_depth/All_Vis_layerdepth_fixed.csv")
+
+All_V1_cellmetadata <- fread("C:/Users/rinal/Box/HG_lab/Vizgen/analysis_files_from_all_exps/summary_tables/V1_layerdepth_files/New_depths_all_layers/exp1_exp2_exp6_exp7_V1_minVol100_maxVol3Med_minCount300_newlayerDepths_table.csv")
+
+colnames(All_V1_cellmetadata)[1] <- "cell.id"
+
+All_V1_layerdepth <- All_Vis_layerdepth[All_Vis_layerdepth$cell.id %in% All_V1_cellmetadata$cell.id]
+```
+
+```{r}
+#pull out L2/3 and L4 cells
+All_V1_layerdepth_L234IT <- All_V1_layerdepth[subclass_label=="L2/3 IT CTX" | subclass_label=="L4/5 IT CTX"]
+All_V1_layerdepth_L234IT <- All_V1_layerdepth_L234IT[t.type.Under1Over1=="WT" | t.type.Under1Over1=="KO"]
+```
+
+```{r}
+#pull out L5 and L6 cells
+All_V1_layerdepth_L56IT <- All_V1_layerdepth[subclass_label=="L5 PT CTX" | subclass_label=="L5 IT CTX" | subclass_label=="L6 IT CTX" | subclass_label=="L6 CT CTX" | subclass_label == "L5/6 NP CTX" | subclass_label == "L6b CTX"]
+```
+
+#pull out WT and KO cells separately
+```{r}
+All_V1_layerdepth_L234IT_WT <- All_V1_layerdepth_L234IT[t.type.Under1Over1=="WT"]
+All_V1_layerdepth_L234IT_KO <- All_V1_layerdepth_L234IT[t.type.Under1Over1=="KO"]
+
+All_V1_layerdepth_L56_WT <- All_V1_layerdepth_L56IT[t.type.Under1Over1=="WT"]
+All_V1_layerdepth_L56_KO <- All_V1_layerdepth_L56IT[t.type.Under1Over1=="KO"]
+```
+
+## organize L2/3 and L4 subclass-level data
+```{r}
+All_V1_layerdepth_L234IT_subclass = All_V1_layerdepth_L234IT %>% mutate(subclass = factor(subclass_label, levels=c("L2/3 IT CTX", "L4/5 IT CTX")))
+All_V1_layerdepth_L234IT_subclass = All_V1_layerdepth_L234IT_subclass %>% mutate(genetype = factor(t.type.Under1Over1, levels=c("WT", "KO")))
+```
+
+## organize L5/6 subclass-level data
+```{r}
+All_V1_layerdepth_L56IT_subclass = All_V1_layerdepth_L56IT %>% mutate(subclass = factor(subclass_label, levels=c("L5 PT CTX", "L5 IT CTX", "L5/6 NP CTX", "L6 IT CTX", "L6 CT CTX", "L6b CTX")))
+All_V1_layerdepth_L56IT_subclass = All_V1_layerdepth_L56IT_subclass %>% mutate(genetype = factor(t.type.Under1Over1, levels=c("WT", "KO")))
+```
+
+## plot L2/3 and L4 IT cells
+```{r}
+ggplot(All_V1_layerdepth_L234IT_subclass[!is.na(t.type.Under1Over1)], aes(x = subclass_label, y = as.numeric(NDR), fill=subclass_label))+
+  ggtitle("L2/3 and L4 IT cells by cortical layer depth (KO vs. WT)")+
+  geom_violin(aes(middle = mean(as.numeric(NDR))), outlier.shape = NA, notch=TRUE)+
+ # geom_point(position = position_jitter(seed = 1, width = 0.2), size = 0.1, colour = "grey") +
+  geom_boxplot(width=0.10, outlier.shape=NA)+
+  coord_cartesian(ylim=c(0,1))+
+  ylab("cortical depth") + xlab("cell subclass")+
+  scale_fill_manual(values = colors_subclass) +
+  facet_grid(.~subclass+genetype,
+             switch = "x",
+             labeller = label_wrap_gen(width=8),
+             scales = "free_x"
+  ) + 
+  theme_bw()+
+  theme(strip.background =element_rect(fill="white"), strip.text.x = element_text(angle=0, size=8))+
+  theme(plot.title=element_text(hjust=0.5), legend.position = "bottom", legend.margin=margin(), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        axis.line.y=element_line(color="black"), axis.ticks.x = element_blank(), axis.text.y=element_text(size=10), axis.text.x=element_blank()) +
+  guides(fill=guide_legend(nrow=1, byrow=TRUE))
+```
+
+
+```{r}
+ggsave(filename="C:/Users/rinal/Box/HG_lab/Rinaldo/Vizgen/scripts/script_outputs/Vis_layerdepth_violin_L56IT_WTvsKO.png", width = 25, height = 5, dpi = 300, units = "in", device='png')
+ggsave(filename="C:/Users/rinal/Box/HG_lab/Rinaldo/Vizgen/scripts/script_outputs/Vis_layerdepth_violin_L56IT_WTvsKO.eps", width = 25, height = 5, dpi = 300, units = "in", device='eps')
+```
+
+## plot L5 and L6 IT cells
+```{r}
+ggplot(All_V1_layerdepth_L56IT_subclass[!is.na(t.type.Under1Over1)], aes(x = subclass_label, y = as.numeric(NDR), fill=subclass_label))+
+  ggtitle("L5 and L6 IT cells by cortical layer depth (KO vs. WT)")+
+  geom_violin(aes(middle = mean(as.numeric(NDR))), outlier.shape = NA, notch=TRUE)+
+ # geom_point(position = position_jitter(seed = 1, width = 0.2), size = 0.1, colour = "grey") +
+  geom_boxplot(width=0.10, outlier.shape=NA, color = "white")+
+  coord_cartesian(ylim=c(0,1))+
+  ylab("cortical depth") + xlab("cell subclass")+
+  scale_fill_manual(values = colors_subclass) +
+  facet_grid(.~subclass+genetype,
+             switch = "x",
+             labeller = label_wrap_gen(width=8),
+             scales = "free_x"
+  ) + 
+  theme_bw()+
+  theme(strip.background =element_rect(fill="white"), strip.text.x = element_text(angle=0, size=8))+
+  theme(plot.title=element_text(hjust=0.5), legend.position = "bottom", legend.margin=margin(), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        axis.line.y=element_line(color="black"), axis.ticks.x = element_blank(), axis.text.y=element_text(size=10), axis.text.x=element_blank()) +
+  guides(fill=guide_legend(nrow=1, byrow=TRUE))
+```
+
+
+```{r}
+ggsave(filename="C:/Users/rinal/Box/HG_lab/Rinaldo/Vizgen/scripts/script_outputs/Vis_layerdepth_MGE_WTvsKO_bycelltype.png", width = 25, height = 5, dpi = 300, units = "in", device='png')
+ggsave(filename="C:/Users/rinal/Box/HG_lab/Rinaldo/Vizgen/scripts/script_outputs/Vis_layerdepth_MGE_WTvsKO_bycelltype.eps", width = 25, height = 5, dpi = 300, units = "in", device='eps')
+```
+
+## plot all excitatory neurons together
+
+## organize subclass-level data of excitatory cells
+```{r}
+All_V1_layerdepth_exc_subclass <- All_V1_layerdepth[subclass_label=="L2/3 IT CTX" | subclass_label=="L4/5 IT CTX" | subclass_label=="L5 PT CTX" | subclass_label=="L5 IT CTX" | subclass_label=="L5/6 NP CTX" | subclass_label == "L5/6 IT CTX" | subclass_label=="L6 IT CTX" | subclass_label=="L6 CT CTX" | subclass_label == "L6b CTX"]
+
+All_V1_layerdepth_exc_subclass = All_V1_layerdepth_exc_subclass %>% mutate(subclass = factor(subclass_label, levels=c("L2/3 IT CTX", "L4/5 IT CTX", "L5 PT CTX", "L5 IT CTX", "L5/6 NP CTX", "L5/6 IT CTX", "L6 IT CTX", "L6 CT CTX", "L6b CTX")))
+All_V1_layerdepth_exc_subclass = All_V1_layerdepth_exc_subclass %>% mutate(genetype = factor(t.type.Under1Over1, levels=c("WT", "KO")))
+```
+
+```{r}
+ggplot(All_V1_layerdepth_exc_subclass[!is.na(t.type.Under1Over1)], aes(x = subclass_label, y = as.numeric(NDR), fill=subclass_label))+
+  ggtitle("L2/3, L4, L5, and L6 IT cells by cortical layer depth (KO vs. WT)")+
+  geom_violin(aes(middle = mean(as.numeric(NDR))), outlier.shape = NA, notch=TRUE)+
+ # geom_point(position = position_jitter(seed = 1, width = 0.2), size = 0.1, colour = "grey") +
+  geom_boxplot(width=0.10, outlier.shape=NA, color = "white")+
+  coord_cartesian(ylim=c(0,1))+
+  ylab("cortical depth") + xlab("cell subclass")+
+  scale_fill_manual(values = colors_subclass) +
+  facet_grid(.~subclass+genetype,
+             switch = "x",
+             labeller = label_wrap_gen(width=8),
+             scales = "free_x"
+  ) + 
+  theme_bw()+
+  theme(strip.background =element_rect(fill="white"), strip.text.x = element_text(angle=0, size=8))+
+  theme(plot.title=element_text(hjust=0.5), legend.position = "bottom", legend.margin=margin(), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        axis.line.y=element_line(color="black"), axis.ticks.x = element_blank(), axis.text.y=element_text(size=10), axis.text.x=element_blank()) +
+  guides(fill=guide_legend(nrow=1, byrow=TRUE))
+```
+
+
+```{r}
+ggsave(filename="C:/Users/rinal/Box/HG_lab/Rinaldo/Vizgen/scripts/script_outputs/V1_layerdepth_violin_exc_WTvsKO.png", width = 25, height = 5, dpi = 300, units = "in", device='png')
+ggsave(filename="C:/Users/rinal/Box/HG_lab/Rinaldo/Vizgen/scripts/script_outputs/V1_layerdepth_violin_exc_WTvsKO.eps", width = 25, height = 5, dpi = 300, units = "in", device='eps')
+```
