@@ -99,6 +99,14 @@ CB_WT_KO_avg_mCA_corrected <- mean(tissue_meths_all3[variable %in% cols_CB, mCA_
 HYPO_WT_KO_avg_mCA_corrected <- mean(tissue_meths_all3[variable %in% cols_HYPO, mCA_corrected])
 STR_WT_KO_avg_mCA_corrected <- mean(tissue_meths_all3[variable %in% cols_STR, mCA_corrected])
 
+
+#standard error function
+std <- function(x) sd(x)/sqrt(length(x))
+
+CB_WT_KO_se_mCA_corrected <- std(tissue_meths_all3[variable %in% cols_CB, mCA_corrected])
+HYPO_WT_KO_se_mCA_corrected <- std(tissue_meths_all3[variable %in% cols_HYPO, mCA_corrected])
+STR_WT_KO_se_mCA_corrected <- std(tissue_meths_all3[variable %in% cols_STR, mCA_corrected])
+
 #naming columns
 names(CB_WT_KO_fullGene_mCA) <- c("chrom", "start", "end", "Gene", "transcripts", "strand", "meth_reads", "cyto_reads")
 names(HYPO_WT_KO_fullGene_mCA) <- c("chrom", "start", "end", "Gene", "transcripts", "strand", "meth_reads", "cyto_reads")
@@ -148,20 +156,20 @@ HYPO_long_highmCA_genes <- HYPO_WT_KO_fullGene_mCA_filt[, Gene]
 STR_long_highmCA_genes <- STR_WT_KO_fullGene_mCA_filt[, Gene]
 
 
-#standard error function
-std <- function(x) sd(x)/sqrt(length(x))
 
 tissue_long_highmCA_genes_FC <- rbind(
-  cbind(id.var="CB", long_highmCA_gene_logfc_mean=mean(tissue_fc_table[Gene %in% CB_long_highmCA_genes , CB_KO_FC]), long_highmCA_gene_logfc_se=std(tissue_fc_table[Gene %in% CB_long_highmCA_genes, CB_KO_FC]), mean_mCA_corrected=CB_WT_KO_avg_mCA_corrected),
-  cbind(id.var="HYPO", long_highmCA_gene_logfc_mean=mean(tissue_fc_table[Gene %in% HYPO_long_highmCA_genes , HPTH_KO_FC]), long_highmCA_gene_logfc_se=std(tissue_fc_table[Gene %in% HYPO_long_highmCA_genes, HPTH_KO_FC]), mean_mCA_corrected=HYPO_WT_KO_avg_mCA_corrected),
-  cbind(id.var="STR", long_highmCA_gene_logfc_mean=mean(tissue_fc_table[Gene %in% STR_long_highmCA_genes , STR_KO_FC]), long_highmCA_gene_logfc_se=std(tissue_fc_table[Gene %in% STR_long_highmCA_genes, STR_KO_FC]), mean_mCA_corrected=STR_WT_KO_avg_mCA_corrected)
+  cbind(id.var="CB", long_highmCA_gene_logfc_mean=mean(tissue_fc_table[Gene %in% CB_long_highmCA_genes , CB_KO_FC]), long_highmCA_gene_logfc_se=std(tissue_fc_table[Gene %in% CB_long_highmCA_genes, CB_KO_FC]), mean_mCA_corrected=CB_WT_KO_avg_mCA_corrected, se_mCA_corrected=CB_WT_KO_se_mCA_corrected),
+  cbind(id.var="HYPO", long_highmCA_gene_logfc_mean=mean(tissue_fc_table[Gene %in% HYPO_long_highmCA_genes , HPTH_KO_FC]), long_highmCA_gene_logfc_se=std(tissue_fc_table[Gene %in% HYPO_long_highmCA_genes, HPTH_KO_FC]), mean_mCA_corrected=HYPO_WT_KO_avg_mCA_corrected, se_mCA_corrected=HYPO_WT_KO_se_mCA_corrected),
+  cbind(id.var="STR", long_highmCA_gene_logfc_mean=mean(tissue_fc_table[Gene %in% STR_long_highmCA_genes , STR_KO_FC]), long_highmCA_gene_logfc_se=std(tissue_fc_table[Gene %in% STR_long_highmCA_genes, STR_KO_FC]), mean_mCA_corrected=STR_WT_KO_avg_mCA_corrected, se_mCA_corrected=STR_WT_KO_se_mCA_corrected)
 ) %>% data.table
 
 
 ggplot(tissue_long_highmCA_genes_FC, aes(x = as.numeric(mean_mCA_corrected), y = as.numeric(long_highmCA_gene_logfc_mean), color = id.var)) +
   ggtitle("Long, highly methylated genes")+
-  geom_point(size = 4)+
+  geom_point(size = 3)+
   geom_errorbar(aes(ymin = as.numeric(long_highmCA_gene_logfc_mean) - as.numeric(long_highmCA_gene_logfc_se), ymax = as.numeric(long_highmCA_gene_logfc_mean) + as.numeric(long_highmCA_gene_logfc_se)), 
+                width = 0.0025) +  # Error bars for standard error
+  geom_errorbar(aes(xmin = as.numeric(mean_mCA_corrected) - as.numeric(se_mCA_corrected), xmax = as.numeric(mean_mCA_corrected) + as.numeric(se_mCA_corrected)), 
                 width = 0.0025) +  # Error bars for standard error
   scale_color_manual(name = "", values = c("CB"="lightgoldenrod3", "HYPO"="gray50", "STR"="black")) +
   ylab("Fold-change MeCP2 KO/WT")+xlab("Mean region mCA/CA")+
@@ -229,80 +237,44 @@ STR_KO_598_2_fullGene_mCA <- tissue_meth_calc_func(meth_table=STR_KO_598_2_fullG
 
 
 reps_tissues_fullGene_mCA <- rbind(
-  cbind(mean_gene_meth=CB_WT_506_3_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_WT_rep1", id.var="PV"),
-  cbind(mean_gene_meth=PV_WT_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_WT_rep2", id.var="PV"),
-  cbind(mean_gene_meth=PV_KO_rep1_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_KO_rep1", id.var="PV"),
-  cbind(mean_gene_meth=PV_KO_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_KO_rep2", id.var="PV"),
-  cbind(mean_gene_meth=SST_WT_rep1_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_WT_rep1", id.var="SST"),
-  cbind(mean_gene_meth=SST_WT_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_WT_rep2", id.var="SST"),
-  cbind(mean_gene_meth=SST_WT_rep3_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_WT_rep3", id.var="SST"),
-  cbind(mean_gene_meth=SST_KO_rep1_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_KO_rep1", id.var="SST"),
-  cbind(mean_gene_meth=SST_KO_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_KO_rep2", id.var="SST"),
-  cbind(mean_gene_meth=L4_WT_rep1_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_WT_rep1", id.var="L4"),
-  cbind(mean_gene_meth=L4_WT_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_WT_rep2", id.var="L4"),
-  cbind(mean_gene_meth=L4_KO_rep1_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_KO_rep1", id.var="L4"),
-  cbind(mean_gene_meth=L4_KO_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_KO_rep2", id.var="L4"),
-  cbind(mean_gene_meth=L5_WT_rep1_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_WT_rep1", id.var="L5"),
-  cbind(mean_gene_meth=L5_WT_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_WT_rep2", id.var="L5"),
-  cbind(mean_gene_meth=L5_KO_rep1_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_KO_rep1", id.var="L5"),
-  cbind(mean_gene_meth=L5_KO_rep2_gene_body_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_KO_rep2", id.var="L5")
+  cbind(mean_gene_meth=CB_WT_506_3_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="CB_WT_rep1", id.var="CB"),
+  cbind(mean_gene_meth=CB_WT_598_1_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="CB_WT_rep1", id.var="CB"),
+  cbind(mean_gene_meth=CB_KO_506_2_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="CB_KO_rep1", id.var="CB"),
+  cbind(mean_gene_meth=CB_KO_598_2_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="CB_KO_rep2", id.var="CB"),
+  cbind(mean_gene_meth=HYPO_WT_506_3_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="HYPO_WT_rep1", id.var="HYPO"),
+  cbind(mean_gene_meth=HYPO_WT_598_1_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="HYPO_WT_rep1", id.var="HYPO"),
+  cbind(mean_gene_meth=HYPO_KO_506_2_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="HYPO_KO_rep1", id.var="HYPO"),
+  cbind(mean_gene_meth=HYPO_KO_598_2_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="HYPO_KO_rep2", id.var="HYPO"),
+  cbind(mean_gene_meth=STR_WT_506_3_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="STR_WT_rep1", id.var="STR"),
+  cbind(mean_gene_meth=STR_WT_598_1_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="STR_WT_rep1", id.var="STR"),
+  cbind(mean_gene_meth=STR_KO_506_2_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="STR_KO_rep1", id.var="STR"),
+  cbind(mean_gene_meth=STR_KO_598_2_fullGene_mCA[, mean(gene_methylation_corrected, na.rm=TRUE)], label="STR_KO_rep2", id.var="STR")
 ) %>% data.table
+  
+#grand mean and standard error of genic mCG levels across reps
+tissues_mean_reps_data_full_mCA <- aggregate(as.numeric(mean_gene_meth) ~ id.var, data = reps_tissues_fullGene_mCA, FUN = mean)
+tissues_se_reps_data_full_mCA <- aggregate(as.numeric(mean_gene_meth) ~ id.var, data = reps_tissues_fullGene_mCA, FUN = function(x) sd(x) / sqrt(length(x)))
 
-reps_INTACT_geneBody_mCG <- rbind(
-  cbind(mean_gene_meth=PV_WT_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_WT_rep1", id.var="PV"),
-  cbind(mean_gene_meth=PV_WT_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_WT_rep2", id.var="PV"),
-  cbind(mean_gene_meth=PV_KO_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_KO_rep1", id.var="PV"),
-  cbind(mean_gene_meth=PV_KO_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="PV_KO_rep2", id.var="PV"),
-  cbind(mean_gene_meth=SST_WT_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_WT_rep1", id.var="SST"),
-  cbind(mean_gene_meth=SST_WT_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_WT_rep2", id.var="SST"),
-  cbind(mean_gene_meth=SST_WT_rep3_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_WT_rep3", id.var="SST"),
-  cbind(mean_gene_meth=SST_KO_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_KO_rep1", id.var="SST"),
-  cbind(mean_gene_meth=SST_KO_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="SST_KO_rep2", id.var="SST"),
-  cbind(mean_gene_meth=L4_WT_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_WT_rep1", id.var="L4"),
-  cbind(mean_gene_meth=L4_WT_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_WT_rep2", id.var="L4"),
-  cbind(mean_gene_meth=L4_KO_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_KO_rep1", id.var="L4"),
-  cbind(mean_gene_meth=L4_KO_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L4_KO_rep2", id.var="L4"),
-  cbind(mean_gene_meth=L5_WT_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_WT_rep1", id.var="L5"),
-  cbind(mean_gene_meth=L5_WT_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_WT_rep2", id.var="L5"),
-  cbind(mean_gene_meth=L5_KO_rep1_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_KO_rep1", id.var="L5"),
-  cbind(mean_gene_meth=L5_KO_rep2_gene_body_mCG[, mean(gene_methylation_corrected, na.rm=TRUE)], label="L5_KO_rep2", id.var="L5")
-) %>% data.table
+tissues_reps_full_mCA <- merge(tissues_mean_reps_data_full_mCA, tissues_se_reps_data_full_mCA, by = "id.var", suffixes = c("_mean", "_se"))
+names(tissues_reps_full_mCA) <- c("id.var", "gene_meth_grand_mean", "gene_meth_grand_se")
 
 
-reps_INTACT_geneBody_mCA = reps_INTACT_geneBody_mCA %>% mutate(id.var = factor(id.var, levels=c("L4", "L5", "PV", "SST")))
-reps_INTACT_geneBody_mCG = reps_INTACT_geneBody_mCG %>% mutate(id.var = factor(id.var, levels=c("L4", "L5", "PV", "SST")))
-
-#grand mean and standard error of genic mCA levels across reps
-mean_reps_data_full_mCA <- aggregate(as.numeric(mean_gene_meth) ~ id.var, data = reps_INTACT_geneBody_mCA, FUN = mean)
-se_reps_data_full_mCA <- aggregate(as.numeric(mean_gene_meth) ~ id.var, data = reps_INTACT_geneBody_mCA, FUN = function(x) sd(x) / sqrt(length(x)))
-
-data_reps_full_mCA <- merge(mean_reps_data_full_mCA, se_reps_data_full_mCA, by = "id.var", suffixes = c("_mean", "_se"))
-names(data_reps_full_mCA) <- c("id.var", "gene_meth_grand_mean", "gene_meth_grand_se")
+reps_tissue_long_highmCA_genes_FC <- left_join(x=tissue_long_highmCA_genes_FC, y=tissues_reps_full_mCA, by=c("id.var"))
 
 
-####
 
-
-#long, highly methylated genes 
-data_reps_full_mCA_numDys_long_highmCA <- left_join(x=data_reps_full_mCA_numDys, y=long_highmCA_genes_deseq, by=c("id.var"))
-
-data_reps_full_mCA_numDys_long_highmCA$long_highmCA_gene_logfc_mean <- as.numeric(data_reps_full_mCA_numDys_long_highmCA$long_highmCA_gene_logfc_mean)
-data_reps_full_mCA_numDys_long_highmCA$long_highmCA_gene_logfc_se <- as.numeric(data_reps_full_mCA_numDys_long_highmCA$long_highmCA_gene_logfc_se)
-
-data_reps_full_mCA_numDys_long_highmCA = data_reps_full_mCA_numDys_long_highmCA %>% mutate(id.var = factor(id.var, levels=c("L4", "L5", "PV", "SST")))
-
-
-ggplot(data_reps_full_mCA_numDys_long_highmCA, aes(x = as.numeric(gene_meth_grand_mean), y = as.numeric(long_highmCA_gene_logfc_mean), color = id.var)) +
+ggplot(reps_tissue_long_highmCA_genes_FC, aes(x = as.numeric(gene_meth_grand_mean), y = as.numeric(long_highmCA_gene_logfc_mean), color = id.var)) +
   ggtitle("Long, highly methylated genes")+
-  geom_point(shape = 18, size = 10) +  # Diamond shape for mean
-  geom_errorbar(aes(ymin = long_highmCA_gene_logfc_mean - long_highmCA_gene_logfc_se, ymax = long_highmCA_gene_logfc_mean + long_highmCA_gene_logfc_se), 
-                width = 0.0025) +  # Error bars for standard error
-  scale_color_manual(name = "", values = c("L4"="skyblue", "L5"="purple3", "PV"="forestgreen", "SST"="darkorange")) +
-  ylab("Mean log2 FC MeCP2 KO/WT")+xlab("Mean genic mCA/CA")+
-  coord_cartesian(xlim=c(0.0,0.05), ylim = c(0, 0.16)) +
+  geom_point(size = 3)+
+  geom_errorbar(aes(ymin = as.numeric(long_highmCA_gene_logfc_mean) - as.numeric(long_highmCA_gene_logfc_se), ymax = as.numeric(long_highmCA_gene_logfc_mean) + as.numeric(long_highmCA_gene_logfc_se),
+                width = 0.0025)) +  # Error bars for standard error
+  geom_errorbar(aes(xmin = as.numeric(gene_meth_grand_mean) - as.numeric(gene_meth_grand_se), xmax = as.numeric(gene_meth_grand_mean) + as.numeric(gene_meth_grand_se))) +
+  scale_color_manual(name = "", values = c("CB"="lightgoldenrod3", "HYPO"="gray50", "STR"="black")) +
+  ylab("Fold-change MeCP2 KO/WT")+xlab("Mean region mCA/CA")+
+  coord_cartesian(xlim=c(0.0,0.03), ylim = c(0, 0.1)) +
   theme_bw()+
   theme(strip.background =element_rect(fill="white"), strip.text.x = element_text(angle=0, size=8))+
-  theme(plot.title=element_text(hjust=0.5), legend.position = "None", legend.margin=margin(), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+  theme(plot.title=element_text(hjust=0.5), legend.position = "bottom", legend.margin=margin(), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         axis.line=element_line(color="black"))
-ggsave("HG_lab/Mati/GabelLab/cell_confusion_revision_plots_and_data/dotplots/grandMean_by_reps_INTACT_corrected_full_genic_mCAperCA_vs_long_top10percentHighmCA_gene_Log2FC_diamond_plot.png", width = 3.5, height = 5, dpi = 300, units = "in", device='png')
-ggsave("HG_lab/Mati/GabelLab/cell_confusion_revision_plots_and_data/dotplots/grandMean_by_reps_INTACT_corrected_full_genic_mCAperCA_vs_long_top10percentHighmCA_gene_Log2FC_diamond_plot.eps", width = 3.5, height = 5, dpi = 300, units = "in", device='eps')
+ggsave("HG_lab/Mati/GabelLab/cell_confusion_revision_plots_and_data/dotplots/repErrors_CB_HYPO_STR_region_corrected_mCA_long_top10percentHighmCA_gene_MeCP2KOWT_foldChange_dotplot.png", width = 3.5, height = 5, dpi = 300, units = "in", device='png')
+ggsave("HG_lab/Mati/GabelLab/cell_confusion_revision_plots_and_data/dotplots/repErrors_CB_HYPO_STR_region_corrected_mCA_long_top10percentHighmCA_gene_MeCP2KOWT_foldChange_dotplot.eps", width = 3.5, height = 5, dpi = 300, units = "in", device='eps')
