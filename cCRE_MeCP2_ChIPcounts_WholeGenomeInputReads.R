@@ -36,18 +36,18 @@ ggplot(union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input, aes(x = cCRE_set, y = log2_Ch
   stat_boxplot(geom='errorbar', width=0.25)+
   geom_boxplot(outlier.shape=NA, notch=TRUE)+
   scale_fill_manual(name = "", values = c("Unchanged cCREs"="gray", "MR cCREs"="red", "MA cCREs"="blue")) +
-  coord_cartesian(ylim=c(-1.5,1.5))+
+  coord_cartesian(ylim=c(-0.6,0.6))+
   ylab("Log2 MeCP2 ChIP/Input cpm ratio") + xlab("")+
   theme_bw()+
   theme(legend.position = "bottom", legend.margin=margin(), panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         axis.line.y=element_line(color="black"), axis.ticks.x = element_blank(), axis.title.x=element_blank(), axis.title.y=element_text(size=15), axis.text.y=element_text(size=15), axis.text.x = element_blank())+
   guides(fill=guide_legend(nrow=3, byrow=TRUE))
-#ggsave("HG_lab/Mati/GabelLab/chip_plots/Pv_MeCP2/cell_confusion_paper_chip_plots/mousebrain_union_nonPromoter_cCREs_H3K27ac_ChIP_fishercomb_MeCP2dys_log2MeCP2_ChIP_over_Input_pv_stroud_8wk_boxplot.png", width = 3.7, height = 5, dpi = 300, units = "in", device='png')
-#ggsave("HG_lab/Mati/GabelLab/chip_plots/Pv_MeCP2/cell_confusion_paper_chip_plots/mousebrain_union_nonPromoter_cCREs_H3K27ac_ChIP_fishercomb_MeCP2dys_log2MeCP2_ChIP_over_Input_pv_stroud_8wk_boxplot.eps", width = 3.7, height = 5, dpi = 300, units = "in", device='eps')
+ggsave("HG_lab/Mati/GabelLab/chip_plots/Pv_MeCP2/cell_confusion_paper_chip_plots/mousebrain_union_nonPromoter_cCREs_H3K27ac_ChIP_fishercomb_MeCP2dys_log2MeCP2_ChIP_over_Input_pv_stroud_8wk_WholeGenome_boxplot.png", width = 3.7, height = 5, dpi = 300, units = "in", device='png')
+ggsave("HG_lab/Mati/GabelLab/chip_plots/Pv_MeCP2/cell_confusion_paper_chip_plots/mousebrain_union_nonPromoter_cCREs_H3K27ac_ChIP_fishercomb_MeCP2dys_log2MeCP2_ChIP_over_Input_pv_stroud_8wk_WholeGenome_boxplot.eps", width = 3.7, height = 5, dpi = 300, units = "in", device='eps')
 
-wilcox.test(union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="Unchanged cCREs", log2_ChIP_Input_ratio_pseud], union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MR cCREs", log2_ChIP_Input_ratio_pseud])$p.value
-wilcox.test(union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MR cCREs", log2_ChIP_Input_ratio_pseud], union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MA cCREs", log2_ChIP_Input_ratio_pseud])$p.value
-wilcox.test(union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="Unchanged cCREs", log2_ChIP_Input_ratio_pseud], union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MA cCREs", log2_ChIP_Input_ratio_pseud])$p.value
+wilcox.test(union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="Unchanged cCREs", log2_ChIP_Input_ratio_pseud], union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MR cCREs", log2_ChIP_Input_ratio_pseud])$p.value #p=6.576453e-304, ****
+wilcox.test(union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MR cCREs", log2_ChIP_Input_ratio_pseud], union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MA cCREs", log2_ChIP_Input_ratio_pseud])$p.value #p<2.2e-16, ****
+wilcox.test(union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="Unchanged cCREs", log2_ChIP_Input_ratio_pseud], union_MeCP2reg_cCREs_MeCP2_ChIP_over_Input[cCRE_set=="MA cCREs", log2_ChIP_Input_ratio_pseud])$p.value #p<2.2e-16, ****
 
 
 
