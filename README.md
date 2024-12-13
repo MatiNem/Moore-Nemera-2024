@@ -1,28 +1,54 @@
 Cheng_gene_plots.R - plots for Extended Data Fig. 9a
+
 Cheng_gene_plots_V1_newLayerDepths_correctOverlap.R - plots for Extended Data Fig. 9b,d
+
 Depth_violin_V1_ITcells_subclass_2024-01-11.rmd - Violin plots of Extended Data Figure 7j; thanks to Rinaldo D'Souza, PhD, for creation of this script
+
 Huntley2020_Exc_vs_Pv_genes_H3K27ac_ChIPcounts.R - Violin plots of fold difference in H3K27ac ChIP-seq signal in PV and total nuclei for PV and excitatory-enriched genes, Fig. 3c
+
 Huntley2020_enriched_genes.R - Identification of PV-enriched and excitatory-enriched genes.
+
 INTACT_cell_type_cCRE_TAD_meth_scatterplots.R - Scatter plots of cCRE methylation vs TAD methylation, Fig. 3e
+
 INTACT_meth_MeCP2_WT_KO_pseudobulk_comparison.R - Scatter plot of gene-body methylation levels of WT and MeCP2 KO cells (Extended Data Fig. 2i) and INTACT vs snmC-seq methylation scatter plot (Extended Data Fig. 1d)
+
 INTACT_meth_diamond_plots_rev.R - Diamond plots of genic methylation levels of INTACT subclasses and other plots, Fig. 1a,f,g and Extended Data Fig. 2g
+
 INTACT_region_geneBodyTSSplus3kb_TSS_intra_extra_cCRE_meth_heatmap.R - Heatmaps of methylation level ratios for genomic elements associated with various genes, Fig. 2 and Extended Data Fig. 3
+
 Li_nonPromoter_cCREs_1500bpWindows_Pv_H3K27ac_cellConfusionPaper_chip_plots.R - Script for H3K27ac fold change plots in Fig. 3 and Extended Data Fig. 4
+
 PVGA_and_nonPVGA_cCRE_H3K27ac_ChIP_over_input_plots_wholeGenomeInputReads.R - Script for plots of H3K27ac ChIP signal in cCREs in Extended Data Fig. 4
+
 PV_and_nonPV_cCRE_INTACT_PV_meth_boxplots.R - Boxplots of methylation of PV and non-PV cCREs in Fig. 3k and Extended Data Fig. 4j-k
+
 Srgap1_Syt13_cCRE_meth_heatmap.R - Srgap1 and Syt13 heatmaps of Figure 3h
+
 aggregate_methylation - folder containing scripts for producing precursors to aggregate methylation plots; thanks to Dennis Wu, PhD, for creation of these scripts
+
 all_cs_effect_size_051822.R - DESeq2 on INTACT-isolated subclasses; thanks to Russell Moore, MD/PhD, for creation of this script
-brain_tissue_global_meth_stripplots.R - Strip plots of global methylation levels of cerebellum, striatum, hypothalamus (Extended Data Fig. 2e) and gene expression fold change of high mCA genes in those tissues (Extended Data Fig. 2f)
+
+brain_tissue_global_meth_stripplots.R - Strip plots of global methylation levels of cerebellum, striatum, hypothalamus (Extended Data Fig. 2e) and gene expression fold change of high mCA genes in those tissues 
+(Extended Data Fig. 2f)
+
 cCRE_INTACT_methPerKB_boxplots.R - Boxplots of methylation level per kb, Fig. 3e and Extended Data Fig. 4b
+
 cCRE_INTACT_meth_rep_stripplots.R - Strip plots of cCRE methylation in Fig. 3 and Extended Data Fig. 4
+
 cCRE_MeCP2_ChIPcounts_WholeGenomeInputReads.R - Script for plots of MeCP2 ChIP signal in cCREs in Extended Data Fig. 4
+
 cell_type_MeCP2_dysregulated_gene_lists_prefiltered.R - Identification of MeCP2-regulated genes in INTACT-isolated subclasses
+
 cell_type_MeCP2dys_gene_cCRE_number_analyses.R - Boxplots of length and number of cCREs in MeCP2-repressed genes, Fig. 2f and Extended Data Fig. 3f
+
 expression_of_Mecp2Reg_genes_regulated_by_cCREs.R
+
 gene_body_INTACT_meth_boxplot_metaMR_resamp.R - Boxplot of methylation of core MeCP2-repressed genes, Extended Data Fig. 2d
+
 gene_body_TSSplus3kb_and_flank_INTACT_meth_tables.R - Script for organizing gene-body and gene-flanking methylation level tables
+
 gene_flank_meth_deciles.R - Diamond plots of number of MeCP2-repressed genes in deciles of methylation levels of INTACT-isolated subclasses, Fig. 2e
+
 gene_flank_ridgeline_plots.R - Script for making ridgeline plots of methylation level in bins of various regions in INTACT-isolated subclasses
 geo_submission_files_bisulfite.R - Helper script for organizing bisulfite GEO submission
 geo_submission_files_checksum_check.R - Helper script for file checksum checking for GEO submission
