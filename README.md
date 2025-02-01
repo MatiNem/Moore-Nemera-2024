@@ -50,29 +50,59 @@ gene_body_TSSplus3kb_and_flank_INTACT_meth_tables.R - Script for organizing gene
 gene_flank_meth_deciles.R - Diamond plots of number of MeCP2-repressed genes in deciles of methylation levels of INTACT-isolated subclasses, Fig. 2e
 
 gene_flank_ridgeline_plots.R - Script for making ridgeline plots of methylation level in bins of various regions in INTACT-isolated subclasses
+
 geo_submission_files_bisulfite.R - Helper script for organizing bisulfite GEO submission
+
 geo_submission_files_checksum_check.R - Helper script for file checksum checking for GEO submission
+
 global_meth_backgroundSub_INTACT_strip_plots.R - Strip plots of global methylation of INTACT-isolated subclasses, Extended Data Fig. 2h
-homer_TF_diffExp_analysis.R - Boxplot of log2 fold change of gene expression of PV MeCP2-repressed genes, PV MeCP2-activated genes, transcription factors whose motifs are enriched in MeCP2-repressed PV cCREs, transcription factors whose motifs are enriched in MeCP2-repressed non-PV cCREs, and all other genes. Extended Data Fig. 4m
+
+homer_TF_diffExp_analysis.R - Boxplot of log2 fold change of gene expression of PV MeCP2-repressed genes, PV MeCP2-activated genes, transcription factors whose motifs are enriched in MeCP2-repressed PV cCREs, 
+transcription factors whose motifs are enriched in MeCP2-repressed non-PV cCREs, and all other genes. Extended Data Fig. 4m
+
 lambda_nonconversion_averaging.R - Calculating average bisulfite non-conversion rates using lambda phage
+
 mecp2Het_merfish_composition_analysis.R - Composition analysis of WT and MeCP2 KO cells, Extended Data Fig. 7i
+
 mecp2reg_genes_logFC_supplementary_tables.R - Helper script for organizing MeCP2-regulated genes, Table S2
+
 merfish_cortex_hippocampus_analysis.R - Script for processing MERFISH data, including performing pseudobulkDGE between WT and MeCP2 KO cells of each cell type
-merfish_cortex_hippocampus_qc_plots.R - Plots related to MERFISH, Fig. 5 and Extended Data Fig. 7, including UMAP, transcriptotyping, correlation matrix between experiments, INTACT RNA-seq vs MERFISH subclass gene expression scatter plots, number of cells in each subclass
+
+merfish_cortex_hippocampus_qc_plots.R - Plots related to MERFISH, Fig. 5 and Extended Data Fig. 7, including UMAP, transcriptotyping, correlation matrix between experiments, INTACT RNA-seq vs MERFISH subclass 
+
+gene expression scatter plots, number of cells in each subclass
+
 merfish_cortex_hippocampus_subclass_nhood_DEG_plots.R - Violin plots and heatmap of type-DEGs in MERFISH experiments, Fig. 5h,i
+
 merfish_expression_yao2021_marker_heatmap.R - Heatmap of marker genes in MERFISH data, Extended Data Fig. 7e
+
 methylation_merging.py - Script for pooling methylation bed files
+
 plot_enhancer_agg_meth_cellType_comparisons_100bpBins_2500bpFlanks_2lines.R - Aggregate methylation plots for cCREs in Extended Data Fig. 5c
+
 plot_enhancer_agg_meth_cellType_comparisons_100bpBins_2500bpFlanks_nonConv.R - Aggregate methylation plots for cCREs in Fig. 2 and Extended Data Fig. 3
+
 plot_metagene_agg_meth_cellType_comparisons_1kbBins_100kbRange_lessBorder_newBins_nonConv.R - Aggregate methylation plots for genes in Fig. 2 and Extended Data Fig. 3
+
 plot_metagene_agg_meth_cellType_comparisons_1kbBins_100kbRange_lessBorder_only2.R - Aggregate methylation plots for genes in Extended Data Fig. 5c
+
 pseudobulkDGE_by_layerDepth.R - Script for differential gene expression analysis through pseudobulkDGE for each layer depth, Fig. 6
+
 subclass_gene_body_INTACT_meth_vs_INTACT_TPM_scatterplots.R - Scatter plots gene-body methylation vs gene expression, Extended Data Fig. 1e
+
 subclass_gene_body_meth_corrPlots.R - Scatter plots of gene-body methylation of INTACT-isolated subclasses, Extended Data Fig. 1f 
+
 summary_global_meth_brain_tissues_table.R - Summary script for organizing global methylation data of cerebellum, striatum, and hypothalamus
+
 superficial_deep_L23_Cheng_gene_ratio_nonneg_zScore.R - Script for plots of gene expression of layer-specific genes across V1 of L2/3, Fig 6f
+
 transcriptotype_summary_table_merfish.R - Summary table of number of cells in each transcriptotype
-type_vs_type_pseudobulkDGE_analysis_INTACT.R - Boxplot comparing the WT fold differences in expression of type-specific DEGs between closely related types of the same subclass to fold differences between MeCP2 KO and WT cells of MeCP2-repressed genes or non-DEGs, Extended Data Fig. 7k
+
+type_vs_type_pseudobulkDGE_analysis_INTACT.R - Boxplot comparing the WT fold differences in expression of type-specific DEGs between closely related types of the same subclass to fold differences between MeCP2 
+KO and WT cells of MeCP2-repressed genes or non-DEGs, Extended Data Fig. 7k
+
 union_MeCP2dys_cCRE_MeCP2dys_gene_coding_prefilt5_nondedup_overlapAnalysis.R - Overlap heatmap of MeCP2-regulated cCREs and MeCP2-regulated genes
+
 INTACT_long_mCAhigh_gene_TPM_boxplots.R - Violin plots of WT and MeCP2 KO gene expression of MeCP2-regulated genes, Extended Data Fig. 2a
+
 INTACT_MA_plots.R - Log2 fold-difference in gene expression between WT INTACT-isolated subclasses, Extended Data Fig. 1c
